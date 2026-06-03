@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 120 96" fill="none">
+  <rect width="120" height="96" rx="12" fill="#050505"/>
+  <defs>
+    <linearGradient id="g" x1="14" x2="104" y1="11" y2="89" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff6cd"/>
+      <stop offset=".44" stop-color="#d6b15d"/>
+      <stop offset=".74" stop-color="#f5d888"/>
+      <stop offset="1" stop-color="#9c6d22"/>
+    </linearGradient>
+    <radialGradient id="r" cx="0" cy="0" r="1" gradientTransform="matrix(0 52 -64 0 60 49)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe89a" stop-opacity=".68"/>
+      <stop offset=".72" stop-color="#d6b15d" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#d6b15d" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="c"><circle cx="60" cy="43" r="26"/></clipPath>
+  </defs>
+  <ellipse cx="60" cy="47" rx="56" ry="42" fill="url(#r)"/>
+  <path d="M13 18h20l21 43V18h12l20 43 22-43h-20L62 75H49L28 33v42H13V18Z" fill="url(#g)" stroke="#fff2bd" stroke-opacity=".42" stroke-width="1.5"/>
+  <g clip-path="url(#c)" opacity=".72">
+    <circle cx="60" cy="43" r="25" stroke="#f9dd8c" stroke-opacity=".55" stroke-width="2"/>
+    <path d="M60 16 74 39H46L60 16Z" fill="#fff0b5" fill-opacity=".62"/>
+    <path d="m85 34-16 22-12-25 28 3Z" fill="#c9932e" fill-opacity=".72"/>
+    <path d="M73 68H46l15-22 12 22Z" fill="#f8d574" fill-opacity=".7"/>
+    <path d="M35 54 50 31l12 25-27-2Z" fill="#9f701f" fill-opacity=".72"/>
+    <circle cx="60" cy="43" r="8" fill="#090806" fill-opacity=".52"/>
+  </g>
+</svg>
