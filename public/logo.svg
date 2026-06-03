@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#d4af37" />
+      <stop offset="1" stop-color="#b8860b" />
+    </linearGradient>
+    <style>
+      .t{font-family: Georgia, serif; font-weight:700; font-size:48px; fill:url(#g);}
+    </style>
+  </defs>
+  <rect width="100%" height="100%" fill="transparent" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="t">MEET VAGHANI</text>
+</svg>
