@@ -127,114 +127,18 @@ export const portfolioCategories = [
 ];
 
 export const portfolioItems = [
-  // Add videos here manually, like this:
-  // {
-  //   id: 'my-drive-video',
-  //   title: 'Car Delivery Shoot',
-  //   category: 'Car/Bike Delivery Shooting',
-  //   year: '2026',
-  //   googleDriveUrl: 'https://drive.google.com/file/d/FILE_ID/view',
-  //   thumbnail: 'https://your-thumbnail-image-url.jpg',
-  //   aspectRatio: '16 / 9',
-  // },
-  // {
-  //   title: 'Luxury Groom Reel',
-  //   category: 'Reels',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://player.vimeo.com/video/76979871',
-  // },
-  // {
-  //   title: 'Founder Story Film',
-  //   category: 'Corporate',
-  //   year: '2025',
-  //   thumbnail: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  // },
-  // {
-  //   title: 'Jewellery Product Campaign',
-  //   category: 'Product Videos',
-  //   year: '2025',
-  //   thumbnail: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://player.vimeo.com/video/76979871',
-  // },
-  // {
-  //   title: 'Music Night Aftermovie',
-  //   category: 'Events',
-  //   year: '2025',
-  //   thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  // },
-  // {
-  //   title: 'Minimal Studio Reel',
-  //   category: 'Reels',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://player.vimeo.com/video/76979871',
-  // },
-  // {
-  //   title: 'Cafe Brand Business Reel',
-  //   category: 'Business Reel Shooting',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  // },
-  // {
-  //   title: 'Monthly Instagram Content Grid',
-  //   category: 'Instagram Handling',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://player.vimeo.com/video/76979871',
-  // },
-  // {
-  //   title: 'Superbike Delivery Highlight',
-  //   category: 'Car/Bike Delivery Shooting',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1558981285-6f0c94958bb6?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  // },
-  // {
-  //   title: 'Corporate Launch Event Film',
-  //   category: 'Event Video Shoot',
-  //   year: '2025',
-  //   thumbnail: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://player.vimeo.com/video/76979871',
-  // },
-  // {
-  //   title: 'Luxury Birthday Highlight',
-  //   category: 'Birthday Shoot',
-  //   year: '2025',
-  //   thumbnail: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  // },
-  // {
-  //   title: 'Modern Apartment Interior Tour',
-  //   category: 'Home Interior Video',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://player.vimeo.com/video/76979871',
-  // },
-  // {
-  //   title: 'Rain Mood Cinematic Short',
-  //   category: 'Short Cinematic Video',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  // },
-  // {
-  //   title: 'New Showroom Opening Reel',
-  //   category: 'Opening Reels',
-  //   year: '2025',
-  //   thumbnail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://player.vimeo.com/video/76979871',
-  // },
-  // {
-  //   title: 'Fashion Store Product Reel',
-  //   category: 'Shop Reels',
-  //   year: '2026',
-  //   thumbnail: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&w=1200&q=80',
-  //   embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-  // },
+  // Example 1: Google Drive Video
+  {
+    title: 'Luxury Car Delivery',
+    category: 'Car/Bike Delivery Shooting',
+    year: '2026',
+    googleDriveUrl: 'https://drive.google.com/file/d/1Wzwf1MNSzJ7PdsVUXA-EzOMDxmtCEX1a/view?usp=drive_link',
+    thumbnailUrl: '/meet filma-Cover.jpg',
+    // Thumbnail is automatically generated from Google Drive if not provided
+    aspectRatio: '9 / 16',
+  },
+  // Example 2: YouTube Video
+  
 ];
 
 export const testimonials = [
