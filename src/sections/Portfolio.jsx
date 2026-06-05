@@ -103,48 +103,47 @@ export default function Portfolio() {
 
         <motion.div layout className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           <AnimatePresence mode="popLayout">
-            {visibleItems.map((item, index) => (
-              <Reveal key={item.id} delay={index * 0.04}>
-                <motion.article
-                  layout
-                  initial={{ opacity: 0, scale: 0.94 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.94 }}
-                  transition={{ duration: 0.28, ease: 'easeOut' }}
-                  className="group overflow-hidden rounded border border-white/10 bg-white/[0.045]"
+            {visibleItems.map((item) => (
+              <motion.article
+                key={item.id}
+                layout
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="group overflow-hidden rounded border border-white/10 bg-white/[0.045]"
+              >
+                <div
+                  className="relative w-full overflow-hidden"
+                  style={{ aspectRatio: item.aspectRatio || DEFAULT_ASPECT_RATIO }}
                 >
-                  <div
-                    className="relative w-full overflow-hidden"
-                    style={{ aspectRatio: item.aspectRatio || DEFAULT_ASPECT_RATIO }}
+                  <button
+                    type="button"
+                    onClick={() => setActiveVideo(item)}
+                    className="relative block h-full w-full overflow-hidden text-left"
                   >
-                    <button
-                      type="button"
-                      onClick={() => setActiveVideo(item)}
-                      className="relative block h-full w-full overflow-hidden text-left"
-                    >
-                      <img
-                        src={item.thumbnail}
-                        alt={item.title}
-                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      <span className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/18 to-transparent" />
-                      <span className="absolute inset-0 translate-x-[-120%] bg-gradient-to-r from-transparent via-white/14 to-transparent transition duration-700 group-hover:translate-x-[120%]" />
-                      <span className="absolute left-1/2 top-1/2 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-gold text-black shadow-glow transition group-hover:scale-110 group-hover:shadow-[0_0_70px_rgba(214,177,93,0.36)]">
-                        <FaPlay />
+                    <img
+                      src={item.thumbnail}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <span className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/18 to-transparent" />
+                    <span className="absolute inset-0 translate-x-[-120%] bg-gradient-to-r from-transparent via-white/14 to-transparent transition duration-700 group-hover:translate-x-[120%]" />
+                    <span className="absolute left-1/2 top-1/2 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-gold text-black shadow-glow transition group-hover:scale-110 group-hover:shadow-[0_0_70px_rgba(214,177,93,0.36)]">
+                      <FaPlay />
+                    </span>
+                    <span className="absolute bottom-4 left-4 right-4 rounded border border-white/10 bg-black/40 p-3 shadow-soft backdrop-blur-md">
+                      <span className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
+                        {item.category} / {item.year}
                       </span>
-                      <span className="absolute bottom-4 left-4 right-4 rounded border border-white/60 bg-white/82 p-3 shadow-soft backdrop-blur-md">
-                        <span className="text-xs font-bold uppercase tracking-[0.22em] text-[#b88718]">
-                          {item.category} / {item.year}
-                        </span>
-                        <span className="mt-2 block text-xl font-extrabold text-black drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]">
-                          {item.title}
-                        </span>
+                      <span className="mt-2 block text-xl font-extrabold text-white">
+                        {item.title}
                       </span>
-                    </button>
-                  </div>
-                </motion.article>
-              </Reveal>
+                    </span>
+                  </button>
+                </div>
+              </motion.article>
             ))}
           </AnimatePresence>
         </motion.div>
