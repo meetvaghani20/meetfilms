@@ -80,22 +80,25 @@ export default function Portfolio() {
           />
         </div>
 
-        <div className="mx-auto mt-9 flex max-w-6xl flex-wrap justify-center gap-2 sm:gap-3">
-          {portfolioCategories.map((category) => (
-            <motion.div key={category} layout>
-              <button
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                className={`min-h-10 rounded border px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.13em] transition sm:min-h-11 sm:px-4 sm:text-xs ${
-                  activeCategory === category
-                    ? 'border-gold bg-gold text-black'
-                    : 'border-white/10 bg-white/[0.04] text-white/70 hover:border-gold/60 hover:text-gold'
-                }`}
-              >
-                {category}
-              </button>
-            </motion.div>
-          ))}
+        <div className="mx-auto mt-9 flex max-w-xs justify-center">
+          <div className="relative w-full">
+            <select
+              value={activeCategory}
+              onChange={(e) => setActiveCategory(e.target.value)}
+              className="w-full appearance-none rounded border border-white/10 bg-white/[0.04] px-4 py-3 text-xs font-extrabold uppercase tracking-[0.13em] text-white/70 outline-none transition hover:border-gold/60 focus:border-gold focus:text-gold"
+            >
+              {portfolioCategories.map((category) => (
+                <option key={category} value={category} className="bg-ink text-white">
+                  {category}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gold">
+              <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         <motion.div layout className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
