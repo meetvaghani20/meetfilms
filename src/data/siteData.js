@@ -127,6 +127,16 @@ export const portfolioCategories = [
 ];
 
 export const portfolioItems = [
+  // Add videos here manually, like this:
+  // {
+  //   id: 'my-drive-video',
+  //   title: 'Car Delivery Shoot',
+  //   category: 'Car/Bike Delivery Shooting',
+  //   year: '2026',
+  //   googleDriveUrl: 'https://drive.google.com/file/d/FILE_ID/view',
+  //   thumbnail: 'https://your-thumbnail-image-url.jpg',
+  //   aspectRatio: '16 / 9',
+  // },
   // {
   //   title: 'Luxury Groom Reel',
   //   category: 'Reels',

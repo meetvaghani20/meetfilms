@@ -21,10 +21,30 @@ npm run dev
 3. Login with the admin password.
    - Default password: `Meet@2005`
    - To change it, set both `ADMIN_PASSWORD` for the API and `VITE_ADMIN_PASSWORD` for the site.
-4. Add a project title, category, video file, and optional thumbnail image.
+4. Add a project title, category, and Google Drive video link.
 5. Click `Add Project To Portfolio`.
 
-Uploaded videos are saved in `public/uploads`, and portfolio records are saved in `data/portfolio.json`.
+Portfolio records are saved in `data/portfolio.json`. Optional custom thumbnails are saved in `public/uploads`.
+
+For Google Drive videos, open sharing access for the file so visitors can view it. Use a Drive link like `https://drive.google.com/file/d/FILE_ID/view`.
+
+## Add Portfolio Videos In Code
+
+You can also add videos manually in `src/data/siteData.js` inside `portfolioItems`:
+
+```js
+{
+  id: 'car-delivery-shoot',
+  title: 'Car Delivery Shoot',
+  category: 'Car/Bike Delivery Shooting',
+  year: '2026',
+  googleDriveUrl: 'https://drive.google.com/file/d/FILE_ID/view',
+  thumbnail: 'https://your-thumbnail-image-url.jpg',
+  aspectRatio: '16 / 9',
+}
+```
+
+The `googleDriveUrl` will automatically open in the portfolio video player.
 
 Keep `npm run dev` running while uploading. If the upload server is not running, the site will show an error and the video will not be saved only in the admin browser.
 

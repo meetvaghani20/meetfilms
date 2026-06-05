@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FaCloudArrowUp, FaLock, FaPenToSquare, FaPlay, FaRightFromBracket, FaTrash, FaXmark } from 'react-icons/fa6';
+import { FaGoogleDrive, FaLock, FaPenToSquare, FaPlay, FaRightFromBracket, FaTrash, FaXmark } from 'react-icons/fa6';
 import Reveal from '../components/Reveal.jsx';
 import SectionHeading from '../components/SectionHeading.jsx';
 import VideoModal from '../components/VideoModal.jsx';
@@ -12,28 +12,35 @@ const DEFAULT_THUMBNAIL =
   'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80';
 const DEFAULT_ASPECT_RATIO = '16 / 9';
 
-function getVideoAspectRatio(file) {
-  return new Promise((resolve) => {
-    if (!file?.size) {
-      resolve('');
-      return;
-    }
+function getGoogleDriveFileId(value) {
+  const link = value?.toString().trim();
+  if (!link) return '';
 
-    const video = document.createElement('video');
-    const objectUrl = URL.createObjectURL(file);
+  const patterns = [
+    /drive\.google\.com\/file\/d\/([^/]+)/i,
+    /drive\.google\.com\/open\?id=([^&]+)/i,
+    /drive\.google\.com\/uc\?id=([^&]+)/i,
+    /[?&]id=([^&]+)/i,
+  ];
 
-    video.preload = 'metadata';
-    video.onloadedmetadata = () => {
-      const { videoWidth, videoHeight } = video;
-      URL.revokeObjectURL(objectUrl);
-      resolve(videoWidth && videoHeight ? `${videoWidth} / ${videoHeight}` : '');
-    };
-    video.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      resolve('');
-    };
-    video.src = objectUrl;
-  });
+  for (const pattern of patterns) {
+    const match = link.match(pattern);
+    if (match?.[1]) return decodeURIComponent(match[1]);
+  }
+
+  return /^[a-zA-Z0-9_-]{20,}$/.test(link) ? link : '';
+}
+
+function createDriveMedia(googleDriveUrl) {
+  const fileId = getGoogleDriveFileId(googleDriveUrl);
+  if (!fileId) return {};
+
+  return {
+    videoUrl: `https://drive.google.com/file/d/${fileId}/view`,
+    embedUrl: `https://drive.google.com/file/d/${fileId}/preview`,
+    thumbnailUrl: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`,
+    googleDriveUrl: `https://drive.google.com/file/d/${fileId}/view`,
+  };
 }
 
 function getVideoUrlAspectRatio(videoUrl) {
@@ -91,16 +98,20 @@ async function deleteApiUpload(id) {
 }
 
 function createGalleryItem(item) {
+  const driveMedia = createDriveMedia(item.googleDriveUrl);
+
   return {
     id: item.id,
     title: item.title,
     category: item.category,
     year: item.year,
-    thumbnail: item.thumbnailUrl || DEFAULT_THUMBNAIL,
-    videoUrl: item.videoUrl,
+    thumbnail: item.thumbnailUrl || item.thumbnail || driveMedia.thumbnailUrl || DEFAULT_THUMBNAIL,
+    videoUrl: item.videoUrl || driveMedia.videoUrl,
+    embedUrl: item.embedUrl || driveMedia.embedUrl,
+    googleDriveUrl: item.googleDriveUrl || driveMedia.googleDriveUrl,
     aspectRatio: item.aspectRatio || DEFAULT_ASPECT_RATIO,
     hasSavedAspectRatio: Boolean(item.aspectRatio),
-    isServerItem: Boolean(item.videoUrl),
+    isServerItem: Boolean(item.videoUrl || item.googleDriveUrl),
   };
 }
 
@@ -115,16 +126,6 @@ export default function Portfolio() {
   const [storedUploadItems, setStoredUploadItems] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
   const [uploadNotice, setUploadNotice] = useState('');
-
-  const handleVideoFileChange = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      setUploadNotice('');
-      return;
-    }
-
-    setUploadNotice(`Video file selected: ${file.name}`);
-  };
 
   const handleThumbnailFileChange = (event) => {
     const file = event.target.files?.[0];
@@ -182,7 +183,8 @@ export default function Portfolio() {
     };
   }, [uploadedItems]);
 
-  const allItems = useMemo(() => [...uploadedItems, ...portfolioItems], [uploadedItems]);
+  const staticPortfolioItems = useMemo(() => portfolioItems.map(createGalleryItem), []);
+  const allItems = useMemo(() => [...uploadedItems, ...staticPortfolioItems], [uploadedItems, staticPortfolioItems]);
   const visibleItems = useMemo(() => {
     if (activeCategory === 'All') return allItems;
     return allItems.filter((item) => item.category === activeCategory);
@@ -203,8 +205,8 @@ export default function Portfolio() {
   const handleProjectUpload = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const videoFile = formData.get('videoFile');
     const thumbnailFile = formData.get('thumbnailFile');
+    const googleDriveUrl = formData.get('googleDriveUrl')?.toString().trim();
     const title = formData.get('title')?.toString().trim();
     const category = formData.get('category')?.toString();
 
@@ -213,8 +215,8 @@ export default function Portfolio() {
       return;
     }
 
-    if (!editingItem && !videoFile?.size) {
-      setUploadNotice('Please select a video file.');
+    if (!googleDriveUrl) {
+      setUploadNotice('Please paste a Google Drive video link.');
       return;
     }
 
@@ -225,8 +227,8 @@ export default function Portfolio() {
       const apiFormData = new FormData();
       apiFormData.append('title', title);
       apiFormData.append('category', category);
-      apiFormData.append('aspectRatio', videoFile?.size ? await getVideoAspectRatio(videoFile) : existingItem?.aspectRatio || DEFAULT_ASPECT_RATIO);
-      if (videoFile?.size) apiFormData.append('videoFile', videoFile);
+      apiFormData.append('aspectRatio', existingItem?.aspectRatio || DEFAULT_ASPECT_RATIO);
+      apiFormData.append('googleDriveUrl', googleDriveUrl);
       if (thumbnailFile?.size) apiFormData.append('thumbnailFile', thumbnailFile);
 
       await saveApiUpload(apiFormData, editingItem?.id);
@@ -376,19 +378,19 @@ export default function Portfolio() {
                         <option key={category}>{category}</option>
                       ))}
                     </select>
-                    <label className="rounded border border-dashed border-white/15 bg-black/24 p-4 text-center transition hover:border-gold sm:col-span-2">
-                      <FaCloudArrowUp className="mx-auto text-2xl text-gold" />
-                      <span className="mt-2 block text-sm font-bold text-white">Upload video file</span>
-                      <span className="mt-1 block text-xs text-smoke">MP4, MOV, WEBM</span>
-                      <input
-                        name="videoFile"
-                        type="file"
-                        accept="video/*"
-                        required={!editingItem}
-                        className="sr-only"
-                        onChange={handleVideoFileChange}
-                      />
-                    </label>
+                    <input
+                      name="googleDriveUrl"
+                      type="url"
+                      required
+                      defaultValue={editingItem?.googleDriveUrl ?? editingItem?.videoUrl ?? ''}
+                      placeholder="Google Drive video link"
+                      className="min-h-11 rounded border border-white/10 bg-black/30 px-4 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-gold sm:col-span-2"
+                    />
+                    <div className="rounded border border-dashed border-white/15 bg-black/24 p-4 text-center sm:col-span-2">
+                      <FaGoogleDrive className="mx-auto text-2xl text-gold" />
+                      <span className="mt-2 block text-sm font-bold text-white">Only Google Drive video link</span>
+                      <span className="mt-1 block text-xs text-smoke">Set Drive sharing to anyone with the link can view</span>
+                    </div>
                     <label className="rounded border border-dashed border-white/15 bg-black/24 p-4 text-center transition hover:border-gold sm:col-span-2">
                       <span className="text-sm font-bold text-white">Upload thumbnail image</span>
                       <span className="mt-1 block text-xs text-smoke">Optional JPG or PNG</span>

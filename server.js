@@ -100,6 +100,36 @@ function normalizeAspectRatio(value, fallback = DEFAULT_ASPECT_RATIO) {
   return `${Math.round(width)} / ${Math.round(height)}`;
 }
 
+function getGoogleDriveFileId(value) {
+  const link = value?.toString().trim();
+  if (!link) return '';
+
+  const patterns = [
+    /drive\.google\.com\/file\/d\/([^/]+)/i,
+    /drive\.google\.com\/open\?id=([^&]+)/i,
+    /drive\.google\.com\/uc\?id=([^&]+)/i,
+    /[?&]id=([^&]+)/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = link.match(pattern);
+    if (match?.[1]) return decodeURIComponent(match[1]);
+  }
+
+  return /^[a-zA-Z0-9_-]{20,}$/.test(link) ? link : '';
+}
+
+function createGoogleDriveVideo(fileId) {
+  if (!fileId) return null;
+
+  return {
+    googleDriveId: fileId,
+    googleDriveUrl: `https://drive.google.com/file/d/${fileId}/view`,
+    embedUrl: `https://drive.google.com/file/d/${fileId}/preview`,
+    thumbnailUrl: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`,
+  };
+}
+
 async function saveUploadedFile(id, file) {
   if (!file?.buffer?.length) return null;
   const filename = safeFileName(id, file.filename);
@@ -167,13 +197,16 @@ async function handlePortfolioRequest(request, response) {
   }
 
   const id = existing?.id ?? randomUUID();
-  const videoUrl = files.videoFile?.buffer?.length ? await saveUploadedFile(id, files.videoFile) : existing?.videoUrl;
+  const driveVideo = createGoogleDriveVideo(getGoogleDriveFileId(fields.googleDriveUrl));
+  const videoUrl = driveVideo?.googleDriveUrl;
   const thumbnailUrl = files.thumbnailFile?.buffer?.length
     ? await saveUploadedFile(id, files.thumbnailFile)
-    : existing?.thumbnailUrl;
+    : driveVideo?.thumbnailUrl || existing?.thumbnailUrl;
+  const embedUrl = driveVideo?.embedUrl || '';
+  const googleDriveId = driveVideo?.googleDriveId || '';
 
   if (!fields.title || !videoUrl) {
-    sendJson(response, 400, { error: 'Title and video file are required.' });
+    sendJson(response, 400, { error: 'Title and Google Drive video link are required.' });
     return;
   }
 
@@ -187,6 +220,9 @@ async function handlePortfolioRequest(request, response) {
     year: existing?.year ?? new Date().getFullYear().toString(),
     thumbnailUrl: thumbnailUrl || '',
     videoUrl,
+    embedUrl,
+    googleDriveId,
+    googleDriveUrl: driveVideo?.googleDriveUrl || '',
     aspectRatio: normalizeAspectRatio(fields.aspectRatio, existing?.aspectRatio),
     createdAt: existing?.createdAt ?? Date.now(),
     updatedAt: Date.now(),

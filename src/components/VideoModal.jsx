@@ -51,7 +51,15 @@ export default function VideoModal({ item, onClose }) {
                 width: getAspectWidth(item.aspectRatio),
               }}
             >
-              {item.videoUrl ? (
+              {item.embedUrl ? (
+                <iframe
+                  title={item.title}
+                  src={item.embedUrl}
+                  className="h-full w-full"
+                  allow="autoplay; encrypted-media; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              ) : item.videoUrl ? (
                 <video src={item.videoUrl} className="h-full w-full object-contain" controls playsInline />
               ) : (
                 <iframe
