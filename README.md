@@ -1,16 +1,35 @@
-# React + Vite
+# Meet Vaghani Films Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite portfolio site with a small Node API for uploading portfolio videos.
 
-Currently, two official plugins are available:
+## Run Locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+`npm run dev` starts both:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Portfolio API: `http://localhost:5000`
+- Vite site: `http://localhost:5173`
 
-## Expanding the ESLint configuration
+## Upload Portfolio Videos
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Open the site and go to the `Portfolio` section.
+2. Click `Admin Project Upload`.
+3. Login with the admin password.
+   - Default password: `Meet@2005`
+   - To change it, set both `ADMIN_PASSWORD` for the API and `VITE_ADMIN_PASSWORD` for the site.
+4. Add a project title, category, video file, and optional thumbnail image.
+5. Click `Add Project To Portfolio`.
+
+Uploaded videos are saved in `public/uploads`, and portfolio records are saved in `data/portfolio.json`.
+
+Keep `npm run dev` running while uploading. If the upload server is not running, the site will show an error and the video will not be saved only in the admin browser.
+
+## Build
+
+```bash
+npm run build
+```

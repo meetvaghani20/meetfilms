@@ -6,10 +6,11 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const PORT = process.env.PORT || 5000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Meet@2005';
 const DATA_DIR = join(__dirname, 'data');
 const UPLOAD_DIR = join(__dirname, 'public', 'uploads');
 const DATA_FILE = join(DATA_DIR, 'portfolio.json');
+const DEFAULT_ASPECT_RATIO = '16 / 9';
 
 async function ensureStorage() {
   await mkdir(DATA_DIR, { recursive: true });
@@ -87,6 +88,16 @@ function safeFileName(id, filename) {
   const extension = extname(filename) || '';
   const base = filename.replace(extension, '').replace(/[^a-z0-9_-]+/gi, '-').replace(/^-|-$/g, '');
   return `${id}-${base || 'upload'}${extension}`;
+}
+
+function normalizeAspectRatio(value, fallback = DEFAULT_ASPECT_RATIO) {
+  const cleanedValue = value?.toString().trim();
+  if (!cleanedValue) return fallback;
+
+  const [width, height] = cleanedValue.split('/').map((part) => Number(part.trim()));
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return fallback;
+
+  return `${Math.round(width)} / ${Math.round(height)}`;
 }
 
 async function saveUploadedFile(id, file) {
@@ -176,6 +187,7 @@ async function handlePortfolioRequest(request, response) {
     year: existing?.year ?? new Date().getFullYear().toString(),
     thumbnailUrl: thumbnailUrl || '',
     videoUrl,
+    aspectRatio: normalizeAspectRatio(fields.aspectRatio, existing?.aspectRatio),
     createdAt: existing?.createdAt ?? Date.now(),
     updatedAt: Date.now(),
   };

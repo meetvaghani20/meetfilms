@@ -1,6 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { FaXmark } from 'react-icons/fa6';
 
+const DEFAULT_ASPECT_RATIO = '16 / 9';
+
+function getAspectWidth(aspectRatio) {
+  const [width, height] = (aspectRatio || DEFAULT_ASPECT_RATIO).split('/').map((part) => Number(part.trim()));
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return 'min(100%, 960px)';
+
+  return `min(100%, calc((92vh - 76px) * ${width / height}))`;
+}
+
 export default function VideoModal({ item, onClose }) {
   return (
     <AnimatePresence>
@@ -17,7 +26,7 @@ export default function VideoModal({ item, onClose }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 24 }}
             transition={{ duration: 0.28 }}
-            className="w-full max-w-5xl overflow-hidden rounded border border-white/10 bg-charcoal shadow-soft"
+            className="max-h-[92vh] w-full max-w-5xl overflow-hidden rounded border border-white/10 bg-charcoal shadow-soft"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
@@ -34,9 +43,16 @@ export default function VideoModal({ item, onClose }) {
                 <FaXmark />
               </button>
             </div>
-            <div className="aspect-video w-full bg-black">
+            <div
+              className="mx-auto bg-black"
+              style={{
+                aspectRatio: item.aspectRatio || DEFAULT_ASPECT_RATIO,
+                maxHeight: 'calc(92vh - 76px)',
+                width: getAspectWidth(item.aspectRatio),
+              }}
+            >
               {item.videoUrl ? (
-                <video src={item.videoUrl} className="h-full w-full" controls playsInline />
+                <video src={item.videoUrl} className="h-full w-full object-contain" controls playsInline />
               ) : (
                 <iframe
                   title={item.title}

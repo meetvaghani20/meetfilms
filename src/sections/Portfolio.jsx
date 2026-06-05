@@ -1,80 +1,62 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FaCloudArrowUp, FaLock, FaPenToSquare, FaPlay, FaTrash, FaXmark } from 'react-icons/fa6';
+import { FaCloudArrowUp, FaLock, FaPenToSquare, FaPlay, FaRightFromBracket, FaTrash, FaXmark } from 'react-icons/fa6';
 import Reveal from '../components/Reveal.jsx';
 import SectionHeading from '../components/SectionHeading.jsx';
 import VideoModal from '../components/VideoModal.jsx';
 import { portfolioCategories, portfolioItems } from '../data/siteData.js';
 
-const DB_NAME = 'meetVaghaniPortfolio';
-const DB_VERSION = 1;
-const STORE_NAME = 'uploads';
 const API_URL = '/api/portfolio';
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Meet@2005';
 const DEFAULT_THUMBNAIL =
   'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80';
+const DEFAULT_ASPECT_RATIO = '16 / 9';
 
-function openPortfolioDb() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+function getVideoAspectRatio(file) {
+  return new Promise((resolve) => {
+    if (!file?.size) {
+      resolve('');
+      return;
+    }
 
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-      }
+    const video = document.createElement('video');
+    const objectUrl = URL.createObjectURL(file);
+
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      const { videoWidth, videoHeight } = video;
+      URL.revokeObjectURL(objectUrl);
+      resolve(videoWidth && videoHeight ? `${videoWidth} / ${videoHeight}` : '');
     };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    video.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve('');
+    };
+    video.src = objectUrl;
   });
 }
 
-async function getStoredUploads() {
-  const db = await openPortfolioDb();
+function getVideoUrlAspectRatio(videoUrl) {
+  return new Promise((resolve) => {
+    if (!videoUrl) {
+      resolve('');
+      return;
+    }
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readonly');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.getAll();
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-    transaction.oncomplete = () => db.close();
-  });
-}
-
-async function saveStoredUpload(item) {
-  const db = await openPortfolioDb();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.put(item);
-
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-    transaction.oncomplete = () => db.close();
-  });
-}
-
-async function deleteStoredUpload(id) {
-  const db = await openPortfolioDb();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.delete(id);
-
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-    transaction.oncomplete = () => db.close();
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      const { videoWidth, videoHeight } = video;
+      resolve(videoWidth && videoHeight ? `${videoWidth} / ${videoHeight}` : '');
+    };
+    video.onerror = () => resolve('');
+    video.src = videoUrl;
   });
 }
 
 async function getApiUploads() {
   const response = await fetch(API_URL);
-  if (!response.ok) throw new Error('Portfolio API unavailable');
+  if (!response.ok) throw new Error('Portfolio upload server is not running.');
   return response.json();
 }
 
@@ -87,7 +69,10 @@ async function saveApiUpload(formData, id) {
     body: formData,
   });
 
-  if (!response.ok) throw new Error('Portfolio API save failed');
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || 'Portfolio API save failed');
+  }
   return response.json();
 }
 
@@ -99,7 +84,10 @@ async function deleteApiUpload(id) {
     },
   });
 
-  if (!response.ok) throw new Error('Portfolio API delete failed');
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || 'Portfolio API delete failed');
+  }
 }
 
 function createGalleryItem(item) {
@@ -108,8 +96,10 @@ function createGalleryItem(item) {
     title: item.title,
     category: item.category,
     year: item.year,
-    thumbnail: item.thumbnailUrl || (item.thumbnailFile ? URL.createObjectURL(item.thumbnailFile) : DEFAULT_THUMBNAIL),
-    videoUrl: item.videoUrl || URL.createObjectURL(item.videoFile),
+    thumbnail: item.thumbnailUrl || DEFAULT_THUMBNAIL,
+    videoUrl: item.videoUrl,
+    aspectRatio: item.aspectRatio || DEFAULT_ASPECT_RATIO,
+    hasSavedAspectRatio: Boolean(item.aspectRatio),
     isServerItem: Boolean(item.videoUrl),
   };
 }
@@ -152,12 +142,10 @@ export default function Portfolio() {
       const sortedItems = items.sort((first, second) => second.createdAt - first.createdAt);
       setStoredUploadItems(sortedItems);
       setUploadedItems(sortedItems.map(createGalleryItem));
-      return;
-    } catch {
-      const items = await getStoredUploads();
-      const sortedItems = items.sort((first, second) => second.createdAt - first.createdAt);
-      setStoredUploadItems(sortedItems);
-      setUploadedItems(sortedItems.map(createGalleryItem));
+    } catch (error) {
+      setStoredUploadItems([]);
+      setUploadedItems([]);
+      setUploadNotice(error.message);
     }
   };
 
@@ -167,6 +155,33 @@ export default function Portfolio() {
     });
   }, []);
 
+  useEffect(() => {
+    const itemsMissingRatio = uploadedItems.filter((item) => item.videoUrl && !item.hasSavedAspectRatio);
+    if (!itemsMissingRatio.length) return;
+
+    let isMounted = true;
+
+    Promise.all(
+      itemsMissingRatio.map(async (item) => ({
+        id: item.id,
+        aspectRatio: await getVideoUrlAspectRatio(item.videoUrl),
+      })),
+    ).then((ratios) => {
+      if (!isMounted) return;
+
+      setUploadedItems((items) =>
+        items.map((item) => {
+          const ratio = ratios.find((entry) => entry.id === item.id)?.aspectRatio;
+          return ratio ? { ...item, aspectRatio: ratio, hasSavedAspectRatio: true } : item;
+        }),
+      );
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [uploadedItems]);
+
   const allItems = useMemo(() => [...uploadedItems, ...portfolioItems], [uploadedItems]);
   const visibleItems = useMemo(() => {
     if (activeCategory === 'All') return allItems;
@@ -175,14 +190,14 @@ export default function Portfolio() {
 
   const handleAdminLogin = (event) => {
     event.preventDefault();
-    if (password === 'admin123') {
+    if (password === ADMIN_PASSWORD) {
       sessionStorage.setItem('portfolioAdmin', 'true');
       setIsAdmin(true);
       setAdminError('');
       setPassword('');
       return;
     }
-    setAdminError('Wrong admin password');
+    setAdminError('Wrong admin password.');
   };
 
   const handleProjectUpload = async (event) => {
@@ -193,7 +208,15 @@ export default function Portfolio() {
     const title = formData.get('title')?.toString().trim();
     const category = formData.get('category')?.toString();
 
-    if (!title || (!editingItem && !videoFile?.size)) return;
+    if (!title) {
+      setUploadNotice('Project title is required.');
+      return;
+    }
+
+    if (!editingItem && !videoFile?.size) {
+      setUploadNotice('Please select a video file.');
+      return;
+    }
 
     const existingItem = editingItem ? storedUploadItems.find((item) => item.id === editingItem.id) : null;
     if (editingItem && !existingItem) return;
@@ -202,6 +225,7 @@ export default function Portfolio() {
       const apiFormData = new FormData();
       apiFormData.append('title', title);
       apiFormData.append('category', category);
+      apiFormData.append('aspectRatio', videoFile?.size ? await getVideoAspectRatio(videoFile) : existingItem?.aspectRatio || DEFAULT_ASPECT_RATIO);
       if (videoFile?.size) apiFormData.append('videoFile', videoFile);
       if (thumbnailFile?.size) apiFormData.append('thumbnailFile', thumbnailFile);
 
@@ -211,33 +235,8 @@ export default function Portfolio() {
       setEditingItem(null);
       setUploadNotice(editingItem ? 'Project updated successfully.' : 'Project uploaded successfully.');
       event.currentTarget.reset();
-    } catch {
-      const storedItem = {
-        id: editingItem?.id ?? (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${title}`),
-        title,
-        category,
-        year: existingItem?.year ?? new Date().getFullYear().toString(),
-        thumbnailFile: thumbnailFile?.size ? thumbnailFile : existingItem?.thumbnailFile ?? null,
-        videoFile: videoFile?.size ? videoFile : existingItem?.videoFile,
-        createdAt: existingItem?.createdAt ?? Date.now(),
-        updatedAt: Date.now(),
-      };
-
-      if (!storedItem.videoFile) {
-        setUploadNotice('Shared upload server is not running, so this project could not be saved for users.');
-        return;
-      }
-
-      try {
-        await saveStoredUpload(storedItem);
-        await loadStoredPortfolioItems();
-        setActiveCategory('All');
-        setEditingItem(null);
-        setUploadNotice('Saved in this browser only. Start the API server so users can see uploads.');
-        event.currentTarget.reset();
-      } catch {
-        setUploadNotice('Project could not be saved. Try a smaller video file.');
-      }
+    } catch (error) {
+      setUploadNotice(error.message || 'Project could not be saved. Make sure the upload server is running.');
     }
   };
 
@@ -255,6 +254,15 @@ export default function Portfolio() {
     setUploadNotice('');
   };
 
+  const handleAdminLogout = () => {
+    sessionStorage.removeItem('portfolioAdmin');
+    setIsAdmin(false);
+    setEditingItem(null);
+    setPassword('');
+    setAdminError('');
+    setUploadNotice('Admin logged out.');
+  };
+
   const handleDeleteProject = async (item) => {
     const confirmed = window.confirm(`Delete "${item.title}" from Portfolio?`);
     if (!confirmed) return;
@@ -264,15 +272,8 @@ export default function Portfolio() {
       if (activeVideo?.id === item.id) setActiveVideo(null);
       await loadStoredPortfolioItems();
       setUploadNotice('Project deleted successfully.');
-    } catch {
-      try {
-        await deleteStoredUpload(item.id);
-        if (activeVideo?.id === item.id) setActiveVideo(null);
-        await loadStoredPortfolioItems();
-        setUploadNotice('Project deleted from this browser only.');
-      } catch {
-        setUploadNotice('Project could not be deleted.');
-      }
+    } catch (error) {
+      setUploadNotice(error.message || 'Project could not be deleted.');
     }
   };
 
@@ -347,6 +348,17 @@ export default function Portfolio() {
                     onSubmit={handleProjectUpload}
                     className="mt-5 grid gap-3 sm:grid-cols-2"
                   >
+                    <div className="flex items-center justify-between gap-3 rounded border border-white/10 bg-black/20 px-4 py-3 sm:col-span-2">
+                      <span className="text-sm font-bold text-champagne">Admin logged in</span>
+                      <button
+                        type="button"
+                        onClick={handleAdminLogout}
+                        className="flex items-center gap-2 rounded border border-white/10 px-3 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-white transition hover:border-gold hover:text-gold"
+                      >
+                        <FaRightFromBracket />
+                        Logout
+                      </button>
+                    </div>
                     <input
                       name="title"
                       type="text"
@@ -435,7 +447,10 @@ export default function Portfolio() {
                   transition={{ duration: 0.28, ease: 'easeOut' }}
                   className="group overflow-hidden rounded border border-white/10 bg-white/[0.045]"
                 >
-                  <div className="relative aspect-video w-full overflow-hidden">
+                  <div
+                    className="relative w-full overflow-hidden"
+                    style={{ aspectRatio: item.aspectRatio || DEFAULT_ASPECT_RATIO }}
+                  >
                     <button
                       type="button"
                       onClick={() => setActiveVideo(item)}
@@ -452,11 +467,11 @@ export default function Portfolio() {
                     <span className="absolute left-1/2 top-1/2 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-gold text-black shadow-glow transition group-hover:scale-110 group-hover:shadow-[0_0_70px_rgba(214,177,93,0.36)]">
                       <FaPlay />
                     </span>
-                    <span className="absolute bottom-4 left-4 right-4">
-                      <span className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
+                    <span className="absolute bottom-4 left-4 right-4 rounded border border-white/60 bg-white/82 p-3 shadow-soft backdrop-blur-md">
+                      <span className="text-xs font-bold uppercase tracking-[0.22em] text-[#b88718]">
                         {item.category} / {item.year}
                       </span>
-                      <span className="mt-2 block text-xl font-extrabold text-white">{item.title}</span>
+                      <span className="mt-2 block text-xl font-extrabold text-black drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]">{item.title}</span>
                     </span>
                     </button>
                     {isAdmin && item.id ? (
