@@ -77,9 +77,16 @@ async function saveApiUpload(formData, id) {
   });
 
   if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    throw new Error(body.error || 'Portfolio API save failed');
+    try {
+      const body = await response.json();
+      throw new Error(body.error || `Portfolio API error (${response.status})`);
+    } catch (err) {
+      const text = await response.text().catch(() => '');
+      const message = text ? text : `Portfolio API error (${response.status})`;
+      throw new Error(message);
+    }
   }
+
   return response.json();
 }
 
