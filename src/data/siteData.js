@@ -193,7 +193,7 @@ export const portfolioItems = [
  
   {
     id: 'product-1',
-    title: 'PROMO REEL',
+    title: 'jewellery product Reels',
     category: 'Product Videos',
     year: '2026',
     googleDriveUrl: 'https://drive.google.com/file/d/1i8HxLeWuhKJQFahAHQlv5QqXC65GHZBL/view?usp=drive_link',
@@ -202,7 +202,7 @@ export const portfolioItems = [
   },
   {
     id: 'product-2',
-    title: 'PROMO REEL',
+    title: 'jewellery product Reels',
     category: 'Product Videos',
     year: '2026',
     googleDriveUrl: 'https://drive.google.com/file/d/1i_G6DbMWUYw05pH5g_tN26l92TKtFdN0/view?usp=drive_link',
@@ -211,7 +211,7 @@ export const portfolioItems = [
   },
   {
     id: 'product-3',
-    title: 'PROMO REEL',
+    title: 'jewellery product Reels',
     category: 'Product Videos',
     year: '2026',
     googleDriveUrl: 'https://drive.google.com/file/d/1DFCP9L1rq53UYmEW5qvzkEiXhto1_UDJ/view?usp=drive_link',
@@ -220,7 +220,7 @@ export const portfolioItems = [
   },
   {
     id: 'product-4',
-    title: 'PROMO REEL',
+    title: 'jewellery product Reels',
     category: 'Product Videos',
     year: '2026',
     googleDriveUrl: 'https://drive.google.com/file/d/1v-BIOeYmE4-OH45WoBcd1DtHBXr1izeJ/view?usp=drive_link',
@@ -229,7 +229,7 @@ export const portfolioItems = [
   },
   {
     id: 'product-5',
-    title: 'PROMO REEL',
+    title: 'jewellery product Reels',
     category: 'Product Videos',
     year: '2026',
     googleDriveUrl: 'https://drive.google.com/file/d/1xWgMyMGJPN0IjT43pQCD94kdGph6cCv7/view?usp=drive_link',
@@ -238,7 +238,7 @@ export const portfolioItems = [
   },
    {
     id: 'product-6',
-    title: 'PROMO REEL',
+    title: 'jewellery product Reels',
     category: 'Product Videos',
     year: '2026',
     googleDriveUrl: 'https://drive.google.com/file/d/1aWqo6DhIVzlhQqXFhpZjpMY1iskdS9p5/view?usp=drive_link',
