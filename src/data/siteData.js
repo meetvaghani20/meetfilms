@@ -242,7 +242,7 @@ export const portfolioItems = [
     category: 'Product Videos',
     year: '2026',
     googleDriveUrl: 'https://drive.google.com/file/d/1aWqo6DhIVzlhQqXFhpZjpMY1iskdS9p5/view?usp=drive_link',
-    thumbnailUrl: '/PRODUCT6.png',
+    thumbnailUrl: '/PRODUCT6.jpg',
     aspectRatio: '9 / 16',
   },
   {
